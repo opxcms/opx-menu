@@ -30,5 +30,10 @@
       "Modules\\Opx\\Menu\\": "src/"
     }
   },
+  "extra": {
+    "opxcms" : {
+      "module": "Modules\\Opx\\Menu\\Menu"
+    }
+  },
   "minimum-stability": "dev"
 }
