@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'tables' => [],
+    'tables' => ['menus', 'menu_items'],
 ];
