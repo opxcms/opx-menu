@@ -7,6 +7,12 @@ use Modules\Opx\Menu\Helpers\MenuBuilder;
 
 class Menu extends BaseModule
 {
+    /** @var string  Module name */
+    protected $name = 'opx_menu';
+
+    /** @var string  Module path */
+    protected $path = __DIR__;
+
     /**
      * Get rendered menu.
      *
