@@ -9,6 +9,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Core\Http\Controllers\APIListController;
+use Modules\Admin\Authorization\AdminAuthorization;
 use Modules\Opx\Menu\Models\Menu;
 use Modules\Opx\Menu\Models\MenuItem;
 
@@ -18,15 +19,6 @@ class ManageMenuItemsListApiController extends APIListController
 
     protected $caption = 'opx_menu::manage.menu_items';
     protected $source = 'manage/api/module/opx_menu/menu_items_list/items';
-
-    protected $delete = 'manage/api/module/opx_menu/menu_items_actions/delete';
-    protected $restore = 'manage/api/module/opx_menu/menu_items_actions/restore';
-    protected $disable = 'manage/api/module/opx_menu/menu_items_actions/disable';
-    protected $enable = 'manage/api/module/opx_menu/menu_items_actions/enable';
-
-    protected $add = 'opx_menu::menu_items_add';
-    protected $edit = 'opx_menu::menu_items_edit';
-
     protected $children = true;
 
     protected $filters = [
@@ -85,6 +77,10 @@ class ManageMenuItemsListApiController extends APIListController
      */
     public function postItems(Request $request): JsonResponse
     {
+        if (!AdminAuthorization::can('opx_menu::list')) {
+            return $this->returnNotAuthorizedResponse();
+        }
+
         $order = $request->input('order');
         $filters = $request->input('filters');
         $search = $request->input('search');
@@ -262,5 +258,65 @@ class ManageMenuItemsListApiController extends APIListController
         $menus = Menu::query()->orderBy('name')->selectRaw('id, 0 as parent_id, name as caption')->get();
 
         return $menus->toArray();
+    }
+
+    /**
+     * Get add link.
+     *
+     * @return  string
+     */
+    protected function getAddLink(): ?string
+    {
+        return AdminAuthorization::can('opx_menu::item_add') ? 'opx_menu::menu_items_add' : null;
+    }
+
+    /**
+     * Get edit link.
+     *
+     * @return  string
+     */
+    protected function getEditLink(): ?string
+    {
+        return AdminAuthorization::can('opx_menu::item_edit') ? 'opx_menu::menu_items_edit' : null;
+    }
+
+    /**
+     * Get edit link.
+     *
+     * @return  string
+     */
+    protected function getEnableLink(): ?string
+    {
+        return AdminAuthorization::can('opx_menu::item_disable') ? 'manage/api/module/opx_menu/menu_items_actions/enable' : null;
+    }
+
+    /**
+     * Get edit link.
+     *
+     * @return  string
+     */
+    protected function getDisableLink(): ?string
+    {
+        return AdminAuthorization::can('opx_menu::item_disable') ? 'manage/api/module/opx_menu/menu_items_actions/disable' : null;
+    }
+
+    /**
+     * Get edit link.
+     *
+     * @return  string
+     */
+    protected function getDeleteLink(): ?string
+    {
+        return AdminAuthorization::can('opx_menu::item_delete') ? 'manage/api/module/opx_menu/menu_items_actions/delete' : null;
+    }
+
+    /**
+     * Get edit link.
+     *
+     * @return  string
+     */
+    protected function getRestoreLink(): ?string
+    {
+        return AdminAuthorization::can('opx_menu::item_delete') ? 'manage/api/module/opx_menu/menu_items_actions/restore' : null;
     }
 }

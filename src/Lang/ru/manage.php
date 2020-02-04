@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'module_name' => 'Меню',
+
     'menu' => 'Меню',
     'menu_items' => 'Пункты меню',
     'add_menu' => 'Добавление меню',

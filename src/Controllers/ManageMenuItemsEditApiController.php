@@ -8,6 +8,7 @@ use Core\Http\Controllers\APIFormController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Modules\Admin\Authorization\AdminAuthorization;
 use Modules\Opx\Menu\Models\MenuItem;
 use Modules\Opx\Menu\OpxMenu;
 
@@ -28,12 +29,13 @@ class ManageMenuItemsEditApiController extends APIFormController
      */
     public function getAdd(Request $request): JsonResponse
     {
+        if(!AdminAuthorization::can('opx_menu::item_add')) {
+            return $this->returnNotAuthorizedResponse();
+        }
+
         $menuId = $request->input('scope');
         $parentId = $request->input('parent_id', 0);
 
-//        if($parentId !== 0 && !$request->has('__reload')) {
-//            $menuId = MenuItem::where('id', $parentId)->first()->getAttribute('menu_id');
-//        }
         if ($request->has('menu_id')) {
             $menuId = $request->input('menu_id');
         }
@@ -59,6 +61,10 @@ class ManageMenuItemsEditApiController extends APIFormController
      */
     public function getEdit(Request $request): JsonResponse
     {
+        if(!AdminAuthorization::can('opx_menu::item_edit')) {
+            return $this->returnNotAuthorizedResponse();
+        }
+
         $id = $request->input('id');
 
         /** @var MenuItem $item */
@@ -121,6 +127,10 @@ class ManageMenuItemsEditApiController extends APIFormController
      */
     public function postCreate(Request $request): JsonResponse
     {
+        if(!AdminAuthorization::can('opx_menu::item_add')) {
+            return $this->returnNotAuthorizedResponse();
+        }
+
         if ($request->input('__reload') === true) {
             return $this->getAdd($request);
         }
@@ -155,6 +165,10 @@ class ManageMenuItemsEditApiController extends APIFormController
      */
     public function postSave(Request $request): JsonResponse
     {
+        if(!AdminAuthorization::can('opx_menu::item_edit')) {
+            return $this->returnNotAuthorizedResponse();
+        }
+
         if ($request->input('__reload') === true) {
             return $this->getEdit($request);
         }

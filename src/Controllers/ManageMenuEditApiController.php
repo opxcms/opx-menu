@@ -6,6 +6,7 @@ use Core\Foundation\Templater\Templater;
 use Core\Http\Controllers\APIFormController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Modules\Admin\Authorization\AdminAuthorization;
 use Modules\Opx\Menu\Models\Menu;
 use Modules\Opx\Menu\OpxMenu;
 
@@ -24,6 +25,10 @@ class ManageMenuEditApiController extends APIFormController
      */
     public function getAdd(): JsonResponse
     {
+        if(!AdminAuthorization::can('opx_menu::add')) {
+            return $this->returnNotAuthorizedResponse();
+        }
+
         $template = new Templater(OpxMenu::getTemplateFileName('menu.php'));
 
         $template->fillDefaults();
@@ -40,6 +45,10 @@ class ManageMenuEditApiController extends APIFormController
      */
     public function getEdit(Request $request): JsonResponse
     {
+        if(!AdminAuthorization::can('opx_menu::edit')) {
+            return $this->returnNotAuthorizedResponse();
+        }
+
         $id = $request->input('id');
 
         /** @var Menu $menu */
@@ -76,6 +85,10 @@ class ManageMenuEditApiController extends APIFormController
      */
     public function postCreate(Request $request): JsonResponse
     {
+        if(!AdminAuthorization::can('opx_menu::add')) {
+            return $this->returnNotAuthorizedResponse();
+        }
+
         $template = new Templater(OpxMenu::getTemplateFileName('menu.php'));
 
         $template->resolvePermissions();
@@ -107,6 +120,10 @@ class ManageMenuEditApiController extends APIFormController
      */
     public function postSave(Request $request): JsonResponse
     {
+        if(!AdminAuthorization::can('opx_menu::edit')) {
+            return $this->returnNotAuthorizedResponse();
+        }
+
         $id = $request->input('id');
 
         /** @var Menu $menu */

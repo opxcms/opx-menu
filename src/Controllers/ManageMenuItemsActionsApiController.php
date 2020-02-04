@@ -2,14 +2,15 @@
 
 namespace Modules\Opx\Menu\Controllers;
 
-use Core\Http\Controllers\APIListController;
+use Core\Http\Controllers\ApiActionsController;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Exception;
+use Modules\Admin\Authorization\AdminAuthorization;
 use Modules\Opx\Menu\Models\MenuItem;
 
-class ManageMenuItemsActionsApiController extends APIListController
+class ManageMenuItemsActionsApiController extends ApiActionsController
 {
     use FormatMenuItemTrait;
 
@@ -17,25 +18,14 @@ class ManageMenuItemsActionsApiController extends APIListController
      * Delete items with given ids.
      *
      * @param Request $request
+     *
      * @return JsonResponse
      *
      * @throws Exception
      */
     public function postDelete(Request $request): JsonResponse
     {
-        $ids = $request->all();
-
-        /** @var EloquentBuilder $items */
-        $items = MenuItem::query()->whereIn('id', $ids)->get();
-
-        if ($items->count() > 0) {
-            /** @var MenuItem $item */
-            foreach ($items as $item) {
-                $item->delete();
-            }
-        }
-
-        return response()->json(['message' => 'success']);
+        return $this->deleteModels(MenuItem::class, $request->all(), 'opx_menu::item_delete');
     }
 
     /**
@@ -47,25 +37,13 @@ class ManageMenuItemsActionsApiController extends APIListController
      */
     public function postRestore(Request $request): JsonResponse
     {
-        $ids = $request->all();
-
-        /** @var EloquentBuilder $items */
-        $items = MenuItem::query()->whereIn('id', $ids)->onlyTrashed()->get();
-
-        if ($items->count() > 0) {
-            /** @var MenuItem $item */
-            foreach ($items as $item) {
-                $item->restore();
-            }
-        }
-
-        return response()->json(['message' => 'success']);
+        return $this->restoreModels(MenuItem::class, $request->all(), 'opx_menu::item_delete');
     }
 
 
     /**
      * Publish items with given ids and clear publishing limitation dates if need.
-     * Returns response with corrected pages.
+     * Returns response with corrected items.
      *
      * @param Request $request
      *
@@ -73,10 +51,12 @@ class ManageMenuItemsActionsApiController extends APIListController
      */
     public function postEnable(Request $request): JsonResponse
     {
-        $ids = $request->all();
+        if (!AdminAuthorization::can('opx_menu::disable')) {
+            return $this->returnNotAuthorizedResponse();
+        }
 
         /** @var EloquentBuilder $items */
-        $items = MenuItem::query()->withCount('children')->whereIn('id', $ids)->get();
+        $items = MenuItem::query()->withCount('children')->whereIn('id', $request->all())->get();
 
         $changed = [];
 
@@ -106,23 +86,6 @@ class ManageMenuItemsActionsApiController extends APIListController
      */
     public function postDisable(Request $request): JsonResponse
     {
-        $ids = $request->all();
-
-        /** @var EloquentBuilder $items */
-        $items = MenuItem::query()->whereIn('id', $ids)->get();
-
-        if ($items->count() > 0) {
-            /** @var MenuItem $item */
-            foreach ($items as $item) {
-                if ($item->isPublished()) {
-                    $item->unPublish();
-                    $item->save();
-                }
-            }
-        }
-
-        return response()->json([
-            'message' => 'success',
-        ]);
+        return $this->disableModels(MenuItem::class, $request->all(), 'published', 'opx_menu::disable');
     }
 }

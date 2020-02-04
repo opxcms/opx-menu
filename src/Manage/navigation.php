@@ -6,11 +6,13 @@ return [
             'caption' => 'opx_menu::manage.menu',
             'section' => 'system/site',
             'route' => 'opx_menu::menu_list',
+            'permission' => 'opx_menu::list',
         ],
         'menu_items' => [
             'caption' => 'opx_menu::manage.menu_items',
             'route' => 'opx_menu::menu_items_list',
             'parent' => 'menus',
+            'permission' => 'opx_menu::list',
         ],
     ],
 

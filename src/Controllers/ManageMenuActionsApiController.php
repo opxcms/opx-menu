@@ -2,14 +2,13 @@
 
 namespace Modules\Opx\Menu\Controllers;
 
-use Core\Http\Controllers\APIListController;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Core\Http\Controllers\ApiActionsController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Exception;
 use Modules\Opx\Menu\Models\Menu;
 
-class ManageMenuActionsApiController extends APIListController
+class ManageMenuActionsApiController extends ApiActionsController
 {
     /**
      * Delete items with given ids.
@@ -21,19 +20,7 @@ class ManageMenuActionsApiController extends APIListController
      */
     public function postDelete(Request $request): JsonResponse
     {
-        $ids = $request->all();
-
-        /** @var EloquentBuilder $menus */
-        $menus = Menu::query()->whereIn('id', $ids)->get();
-
-        if ($menus->count() > 0) {
-            /** @var Menu $menu */
-            foreach ($menus as $menu) {
-                $menu->delete();
-            }
-        }
-
-        return response()->json(['message' => 'success']);
+        return $this->deleteModels(Menu::class, $request->all(), 'opx_menu::delete');
     }
 
     /**
@@ -45,18 +32,6 @@ class ManageMenuActionsApiController extends APIListController
      */
     public function postRestore(Request $request): JsonResponse
     {
-        $ids = $request->all();
-
-        /** @var EloquentBuilder $menus */
-        $menus = Menu::query()->whereIn('id', $ids)->onlyTrashed()->get();
-
-        if ($menus->count() > 0) {
-            /** @var Menu $menu */
-            foreach ($menus as $menu) {
-                $menu->restore();
-            }
-        }
-
-        return response()->json(['message' => 'success']);
+        return $this->restoreModels(Menu::class, $request->all(), 'opx_menu::delete');
     }
 }
