@@ -2,12 +2,10 @@
 
 namespace Modules\Opx\Menu\Controllers;
 
-use Carbon\Carbon;
 use Core\Foundation\Templater\Templater;
 use Core\Http\Controllers\APIFormController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Modules\Admin\Authorization\AdminAuthorization;
 use Modules\Opx\Menu\Models\MenuItem;
 use Modules\Opx\Menu\OpxMenu;
@@ -29,7 +27,7 @@ class ManageMenuItemsEditApiController extends APIFormController
      */
     public function getAdd(Request $request): JsonResponse
     {
-        if(!AdminAuthorization::can('opx_menu::item_add')) {
+        if (!AdminAuthorization::can('opx_menu::item_add')) {
             return $this->returnNotAuthorizedResponse();
         }
 
@@ -61,14 +59,14 @@ class ManageMenuItemsEditApiController extends APIFormController
      */
     public function getEdit(Request $request): JsonResponse
     {
-        if(!AdminAuthorization::can('opx_menu::item_edit')) {
+        if (!AdminAuthorization::can('opx_menu::item_edit')) {
             return $this->returnNotAuthorizedResponse();
         }
 
         $id = $request->input('id');
 
         /** @var MenuItem $item */
-        $item = MenuItem::where('id', $id)->firstOrFail();
+        $item = MenuItem::query()->where('id', $id)->firstOrFail();
 
         if ($request->has('menu_id')) {
             $item->setAttribute('menu_id', $request->input('menu_id', 0));
@@ -80,45 +78,6 @@ class ManageMenuItemsEditApiController extends APIFormController
     }
 
     /**
-     * Fill available parents for current menu.
-     *
-     * @param Templater $template
-     * @param $menuId
-     *
-     * @return  Templater
-     */
-    protected function makeParentOptions(Templater $template, $menuId): Templater
-    {
-        $field = $template->getField('parent_id');
-        $parents = MenuItem::where('menu_id', $menuId)->get(['id', 'parent_id', 'name as caption'])->toArray();
-        $field['options'] = $parents;
-        $template->setField('parent_id', $field);
-
-        return $template;
-    }
-
-    /**
-     * Fill template with data.
-     *
-     * @param string $filename
-     * @param MenuItem $item
-     *
-     * @return  Templater
-     */
-    protected function makeTemplate(MenuItem $item, $filename): Templater
-    {
-        $template = new Templater(OpxMenu::getTemplateFileName($filename));
-
-        $template->fillValuesFromObject($item);
-
-        if ($menuId = $item->getAttribute('menu_id')) {
-            $template = $this->makeParentOptions($template, $menuId);
-        }
-
-        return $template;
-    }
-
-    /**
      * Create or reload new item.
      *
      * @param Request $request
@@ -127,7 +86,7 @@ class ManageMenuItemsEditApiController extends APIFormController
      */
     public function postCreate(Request $request): JsonResponse
     {
-        if(!AdminAuthorization::can('opx_menu::item_add')) {
+        if (!AdminAuthorization::can('opx_menu::item_add')) {
             return $this->returnNotAuthorizedResponse();
         }
 
@@ -165,7 +124,7 @@ class ManageMenuItemsEditApiController extends APIFormController
      */
     public function postSave(Request $request): JsonResponse
     {
-        if(!AdminAuthorization::can('opx_menu::item_edit')) {
+        if (!AdminAuthorization::can('opx_menu::item_edit')) {
             return $this->returnNotAuthorizedResponse();
         }
 
@@ -176,7 +135,7 @@ class ManageMenuItemsEditApiController extends APIFormController
         $id = $request->input('id');
 
         /** @var MenuItem $item */
-        $item = MenuItem::where('id', $id)->firstOrFail();
+        $item = MenuItem::query()->where('id', $id)->firstOrFail();
 
         $template = $template = $this->makeTemplate($item, 'menu_item.php');
 
@@ -197,6 +156,45 @@ class ManageMenuItemsEditApiController extends APIFormController
         $id = $item->getAttribute('id');
 
         return $this->responseFormComponent($id, $template, $this->editCaption, $this->save);
+    }
+
+    /**
+     * Fill available parents for current menu.
+     *
+     * @param Templater $template
+     * @param $menuId
+     *
+     * @return  Templater
+     */
+    protected function makeParentOptions(Templater $template, $menuId): Templater
+    {
+        $field = $template->getField('parent_id');
+        $parents = MenuItem::query()->where('menu_id', $menuId)->get(['id', 'parent_id', 'name as caption'])->toArray();
+        $field['options'] = $parents;
+        $template->setField('parent_id', $field);
+
+        return $template;
+    }
+
+    /**
+     * Fill template with data.
+     *
+     * @param string $filename
+     * @param MenuItem $item
+     *
+     * @return  Templater
+     */
+    protected function makeTemplate(MenuItem $item, $filename): Templater
+    {
+        $template = new Templater(OpxMenu::getTemplateFileName($filename));
+
+        $template->fillValuesFromObject($item);
+
+        if ($menuId = $item->getAttribute('menu_id')) {
+            $template = $this->makeParentOptions($template, $menuId);
+        }
+
+        return $template;
     }
 
     /**

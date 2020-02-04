@@ -60,23 +60,6 @@ class ManageMenuEditApiController extends APIFormController
     }
 
     /**
-     * Fill template with data.
-     *
-     * @param string $filename
-     * @param Menu $menu
-     *
-     * @return  Templater
-     */
-    protected function makeTemplate(Menu $menu, $filename): Templater
-    {
-        $template = new Templater(OpxMenu::getTemplateFileName($filename));
-
-        $template->fillValuesFromObject($menu);
-
-        return $template;
-    }
-
-    /**
      * Create new menu.
      *
      * @param Request $request
@@ -148,6 +131,23 @@ class ManageMenuEditApiController extends APIFormController
         $id = $menu->getAttribute('id');
 
         return $this->responseFormComponent($id, $template, $this->editCaption, $this->save);
+    }
+
+    /**
+     * Fill template with data.
+     *
+     * @param string $filename
+     * @param Menu $menu
+     *
+     * @return  Templater
+     */
+    protected function makeTemplate(Menu $menu, $filename): Templater
+    {
+        $template = new Templater(OpxMenu::getTemplateFileName($filename));
+
+        $template->fillValuesFromObject($menu);
+
+        return $template;
     }
 
     /**

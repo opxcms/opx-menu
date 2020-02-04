@@ -4,7 +4,6 @@ namespace Modules\Opx\Menu\Controllers;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Core\Http\Controllers\APIListController;
 use Modules\Admin\Authorization\AdminAuthorization;
 use Modules\Opx\Menu\Models\Menu;
@@ -18,11 +17,9 @@ class ManageMenuListApiController extends APIListController
     /**
      * Get list of users with sorting, filters and search.
      *
-     * @param Request $request
-     *
      * @return  JsonResponse
      */
-    public function postMenu(Request $request): JsonResponse
+    public function postMenu(): JsonResponse
     {
         if (!AdminAuthorization::can('opx_menu::list')) {
             return $this->returnNotAuthorizedResponse();

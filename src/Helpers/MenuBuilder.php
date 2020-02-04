@@ -26,7 +26,8 @@ class MenuBuilder
     {
         $startTime = microtime(true);
 
-        $menu = Menu::where('alias', $alias)->first();
+        /** @var Menu $menu */
+        $menu = Menu::query()->where('alias', $alias)->first();
 
         if ($menu === null) {
             return null;
@@ -61,9 +62,9 @@ class MenuBuilder
      */
     protected static function getMenuItems(Menu $menu): ?array
     {
-        // Get items for menu.
+        // Get items for the menu.
         /** @var Collection $items */
-        $items = MenuItem::where('menu_id', $menu->getAttribute('id'))
+        $items = MenuItem::query()->where('menu_id', $menu->getAttribute('id'))
             ->where('published', 1)
             ->where(static function ($query) {
                 /** @var Builder $query */
@@ -81,9 +82,8 @@ class MenuBuilder
             ->orderBy('order')
             ->get();
 
+        // Remove unnecessary fields and transform URLs
         $items = $items
-            // Remove unnecessary fields
-            // and transform URLs
             ->map(static function ($item) {
                 /** @var MenuItem $item */
 
@@ -308,7 +308,8 @@ class MenuBuilder
      */
     public static function asArray($alias, $limit): ?array
     {
-        $menu = Menu::where('alias', $alias)->first();
+        /** @var Menu $menu */
+        $menu = Menu::query()->where('alias', $alias)->first();
 
         if ($menu === null) {
             return null;
