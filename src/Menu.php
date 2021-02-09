@@ -3,6 +3,7 @@
 namespace Modules\Opx\Menu;
 
 use Core\Foundation\Module\BaseModule;
+use JsonException;
 use Modules\Opx\Menu\Helpers\MenuBuilder;
 
 class Menu extends BaseModule
@@ -49,9 +50,11 @@ class Menu extends BaseModule
      * @param integer $maxLevels
      *
      * @return  string
+     *
+     * @throws  JsonException
      */
     public function getAsJson($menuAlias, $maxLevels = 0): string
     {
-        return json_encode(MenuBuilder::asArray($menuAlias, $maxLevels));
+        return json_encode(MenuBuilder::asArray($menuAlias, $maxLevels), JSON_THROW_ON_ERROR);
     }
 }

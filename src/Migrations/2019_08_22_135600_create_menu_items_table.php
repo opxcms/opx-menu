@@ -20,7 +20,7 @@ class CreateMenuItemsTable extends OpxMigration
             $table->string('name')->nullable();
 
             $table->parentId('menu_id');
-            $table->parentId('parent_id');
+            $table->parentId();
 
             $table->order();
 
