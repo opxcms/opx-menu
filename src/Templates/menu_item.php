@@ -39,7 +39,7 @@ return [
         // order
         Template::string('order', '/common'),
         // url
-        Template::string('url', '/common', '', [], '', 'required'),
+        Template::string('url', '/common', '', [], '', ''),
         // class
         Template::string('class', '/common'),
         // icon

@@ -93,7 +93,9 @@ class MenuBuilder
                     $url = route($url, [], false);
                 }
 
-                $url = preg_replace('/^\/+/', '/', "/{$url}");
+                if ($url !== null) {
+                    $url = preg_replace('/^\/+/', '/', "/{$url}");
+                }
 
                 return [
                     'id' => $item->getAttribute('id'),
